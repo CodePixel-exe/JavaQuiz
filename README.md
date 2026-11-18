@@ -20,7 +20,7 @@ To run this quiz, head over to the releases section for the JavaQuiz repository 
 Once you have downloaded the zip, extract it to a suitable location.
 **(For ease of use please extract the zip to your desktop and not in a long file directory.)**
 >[!NOTE]
->Currently this .jar file won't load the questions without the required CSV files, please keep the jar in the target folder and the CSV files in the QuizJava folder as this WILL not load the questions.
+>Currently this .jar file won't load the questions without the required CSV files, please keep the jar in the same folder as well as the required CSVs in the folder as this WILL not load the questions.
 
 Method 1:
 Open PowerShell in windows and run the following command:
