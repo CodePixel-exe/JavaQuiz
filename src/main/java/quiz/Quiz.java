@@ -5,9 +5,9 @@ import quiz.com.ui.questions.MultipleChoiceQuestion;
 import quiz.com.ui.questions.Question;
 import quiz.com.ui.questions.TextQuestion;
 import quiz.com.ui.questions.TrueFalseQuestion;
-import quiz.com.ui.questions.io.FileAccess;
+import quiz.com.io.FileAccess;
 
-import java.io.FileNotFoundException;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Scanner;
@@ -26,7 +26,7 @@ public class Quiz {
     public Quiz() {
         try {
             //check how many instances there is of the questions to create and use a loop to create all the questions.
-            ArrayList<String> questions = FileAccess.readFromFile("questionsmerged.csv");
+            ArrayList<String> questions = FileAccess.readFromFile("src/main/resources/questionsmerged.csv");
             Collections.shuffle(questions);
 
             for (int i = 0; i < questions.size(); i++) {
@@ -63,7 +63,7 @@ public class Quiz {
         }
 
         try {
-            ArrayList<String> playerRows = FileAccess.readFromFile("results.csv");
+            ArrayList<String> playerRows = FileAccess.readFromFile("src/main/resources/results.csv");
             for (int i = 0; i < playerRows.size(); i++) {
                 String[] p = playerRows.get(i).split(",");
                 if (p.length == 3) {
@@ -115,6 +115,8 @@ public class Quiz {
             livePlayer.recordScore(total);
             try{
                 FileAccess.writeToFile("results.csv", name + ",," + livePlayer.getScoreAsString());
+
+
 
             }catch (Exception e){
                 System.err.println("An error occurred while saving your results.");
