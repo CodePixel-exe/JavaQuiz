@@ -35,7 +35,7 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>com.example.YourMainClassName</mainClass>
+                            <mainClass>quiz.com.ui.StartQuiz</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
