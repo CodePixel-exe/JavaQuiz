@@ -28,3 +28,12 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+quiz-java.iml
+QuizJava.iml
+uiDesigner.xml
+misc.xml
+jarRepositories.xml
+pom.properties.xml
+mysql_connector_java.xml
+vcs.xml
