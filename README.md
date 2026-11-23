@@ -15,13 +15,20 @@ This should show you the version of Java you have currently installed.
 If this doesn't show anything or you get an error in PowerShell go to the official website for the Java downloads and download the latest version of Java:
 https://www.oracle.com/java/technologies/downloads/
 
-## How to run
-To run this quiz, head over to the releases section for the JavaQuiz repository by clicking here: https://github.com/CodePixel-exe/JavaQuiz/releases and then download the zip.
-Once you have downloaded the zip, extract it to a suitable location.
-**(For ease of use please extract the zip to your desktop and not in a long file directory.)**
->[!NOTE]
->Currently this .jar file won't load the questions without the required CSV files, please keep the jar in the same folder as well as the required CSVs in the folder as this WILL not load the questions.
+## How to run 
+### (Zip file):
+To run this quiz from an IDE, download the zipped folder in the releases section of the repository.
+Extract the folder to a suitable location such as your desktop and then open this in your chosen IDE such as IntelliJ, Visual Studio code, etc.
 
+### (Jar Only):
+To run this quiz, head over to the releases section for the JavaQuiz repository.
+Once you have downloaded the jar, move it to a suitable location.
+**(For ease of use please move the jar file to your desktop and not in a long file directory.)**
+
+Link to releases for zip and jar file:
+https://github.com/CodePixel-exe/JavaQuiz/releases
+
+## Methods to run the .jar file in PowerShell:
 Method 1:
 Open PowerShell in windows and run the following command:
 ```powershell
