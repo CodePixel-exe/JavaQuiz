@@ -1,5 +1,6 @@
 package quiz;
 
+import quiz.com.Database;
 import quiz.com.player.Player;
 import quiz.com.ui.questions.MultipleChoiceQuestion;
 import quiz.com.ui.questions.Question;
@@ -16,67 +17,97 @@ import java.util.Scanner;
 public class Quiz {
     //Default name if the user does not enter a name
     protected String DEFAULT_NAME = "Anon";
+    protected String fileInput = "src/main/resources/questionsmerged.csv";
 
-    private final ArrayList<Question> quizQuestions = new ArrayList<>();
+    private ArrayList<Question> quizQuestions = new ArrayList<>();
     private ArrayList <Player> players = new ArrayList<>();
 
     /** Start of the quiz
-     * Makes arrays read in questions from a file and splits them into rows.
+     * calls the methods to either load from the database or the csv file.
      */
     public Quiz() {
         try {
-            //check how many instances there is of the questions to create and use a loop to create all the questions.
-            ArrayList<String> questions = FileAccess.readFromFile("src/main/resources/questionsmerged.csv");
-            Collections.shuffle(questions);
-
-            for (int i = 0; i < questions.size(); i++) {
-                String[] q = questions.get(i).split(",");
-                //Gets the points and parses them as an integer to get their value
-                int questionType = Integer.parseInt(q[0].strip());
-                int points = Integer.parseInt(q[3].strip());
-
-                switch (questionType) {
-                    case 1: {
-                        Question newQ = new TextQuestion(1, q[1], q[2], points);
-                        quizQuestions.add(newQ);
-                        break;
-                    }
-                    case 2:
-                        Question newTF = new TrueFalseQuestion(2, q[1], Boolean.parseBoolean(q[1].strip()));
-                        quizQuestions.add(newTF);
-                        break;
-
-                    case 3:
-                        Question newMQ = new MultipleChoiceQuestion(3, q[1], q[2], q[4].split(";"), points);
-                        quizQuestions.add(newMQ);
-                        break;
-
-                    default:
-                        System.err.println("Something went wrong with the question order.");
-
-                }
-
-            }
-        } catch (Exception e) {
-            System.err.println("There was a problem loading questions.");
-            e.printStackTrace();
+            quizQuestions = loadQuestionsFromDatabase();
+            //quizQuestions = loadQuestionsFromCSV();
+        } catch (Exception e){
+            System.err.println("Program Stopped.");
+            System.err.println("Exception thrown" + e.getMessage());
+            System.exit(1);
         }
 
-        try {
-            ArrayList<String> playerRows = FileAccess.readFromFile("src/main/resources/results.csv");
-            for (int i = 0; i < playerRows.size(); i++) {
-                String[] p = playerRows.get(i).split(",");
-                if (p.length == 3) {
-                    String firstName = (p[0].strip());
-                    String surname = (p[1].strip());
-                    String scores = (p[2].strip());
-                    players.add(new Player(firstName, surname, scores));
-                }
-            }
-            }catch(Exception e) {
-            System.err.println("No results file found");
-        }
     }
+
+   private ArrayList<Question> loadQuestionsFromDatabase() throws Exception{
+       Database dbQuiz = new Database();
+       dbQuiz.connect();
+       ArrayList<Question> localQuestions = dbQuiz.getAllRows();
+       dbQuiz.insertRow(1,"What is the 32 bit signed integer limit? ","2147483647",2,"");
+       dbQuiz.disconnect();
+
+
+
+       return localQuestions;
+
+   }
+
+   private ArrayList<Question> loadQuestionsFromCSV() {
+       try {
+           //check how many instances there is of the questions to create and use a loop to create all the questions.
+           ArrayList<String> questions = FileAccess.readFromFile(fileInput);
+           Collections.shuffle(questions);
+
+           for (int i = 0; i < questions.size(); i++) {
+               String[] q = questions.get(i).split(",");
+               //Gets the points and parses them as an integer to get their value
+               int questionType = Integer.parseInt(q[0].strip());
+               int points = Integer.parseInt(q[3].strip());
+
+               switch (questionType) {
+                   case 1: {
+                       Question newQ = new TextQuestion(1, q[1], q[2], points);
+                       quizQuestions.add(newQ);
+                       break;
+                   }
+                   case 2:
+                       Question newTF = new TrueFalseQuestion(2, q[1], Boolean.parseBoolean(q[2].strip()));
+                       quizQuestions.add(newTF);
+                       break;
+
+                   case 3:
+                       Question newMQ = new MultipleChoiceQuestion(3, q[1], q[2], q[4].split(";"), points);
+                       quizQuestions.add(newMQ);
+                       break;
+
+                   default:
+                       System.err.println("Something went wrong with the question order.");
+
+               }
+           }
+       } catch (Exception e) {
+           System.err.println("Something went wrong." + e.getMessage());
+       }
+       return quizQuestions;
+   }
+
+
+
+
+   private void loadPreviousPlayerResults(){
+       try {
+           ArrayList<String> playerRows = FileAccess.readFromFile("src/main/resources/results.csv");
+           for (int i = 0; i < playerRows.size(); i++) {
+               String[] p = playerRows.get(i).split(",");
+               if (p.length == 3) {
+                   String firstName = (p[0].strip());
+                   String surname = (p[1].strip());
+                   String scores = (p[2].strip());
+                   players.add(new Player(firstName, surname, scores));
+               }
+           }
+       }catch(Exception e) {
+           System.err.println("No results file found");
+       }
+   }
 
     /** Start Quiz
      * Starts the quiz and loops through questions
@@ -92,19 +123,22 @@ public class Quiz {
             if (name.isEmpty()) {
                 name = DEFAULT_NAME;
             }
+
             Player livePlayer = null;
             for (Player p : players){
                 if(p.getFirstName().equalsIgnoreCase(name)){
                     livePlayer = p;
+                    loadPreviousPlayerResults();
                 }
             }
+
             if (livePlayer == null){
                 livePlayer = new Player(name, "");
                 players.add(livePlayer);
             }
 
 
-            System.out.println("Welcome " + livePlayer.getFirstName()+ " to the quiz of the century!");
+            System.out.println("Welcome " + livePlayer.getFirstName()+ ", to the quiz of the century!");
             //Keep track of score
             int total = 0;
             for (int i = 0; i < quizQuestions.size(); i++) {
@@ -115,9 +149,6 @@ public class Quiz {
             livePlayer.recordScore(total);
             try{
                 FileAccess.writeToFile("results.csv", name + ",," + livePlayer.getScoreAsString());
-
-
-
             }catch (Exception e){
                 System.err.println("An error occurred while saving your results.");
             }
@@ -125,15 +156,16 @@ public class Quiz {
             String choice = input.nextLine();
 
             if(choice.equals("n")){
-
-               System.out.println("\nThank you for playing the quiz. GoodBye!");
                 System.out.println("Your last score: " + livePlayer.getLastScore());
                 System.out.println("Your best score: " + livePlayer.getHighestScore());
+                //Shows how many times they have attempted this quiz.
                 System.out.println("You attempted this quiz: " + livePlayer.getPreviousAttempts() + " times");
                 System.out.println(livePlayer);
+                System.out.println("---------------------------- \nThank you for playing the quiz. GoodBye!");
                break;
             }else{
                 System.out.println("\nRestarting quiz...");
+
             }
 
         }
